@@ -5,10 +5,16 @@
         public string[] players;
         private List<RoundsModel> result = new List<RoundsModel>();
         private List<RoundsModel> rounds = new List<RoundsModel>();
-        public RoundRobin(string players)
+        public RoundRobin(string players, string splitchar = "\n")
         {
-            string[] temp = players.Split("\n");
-            this.players = temp.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            this.players = players
+                .Split(splitchar)
+                .Where(x => !string.IsNullOrEmpty(x))
+                .ToArray();
+            if(this.players.Length == 0 )
+            {
+                throw new Exception("參賽者清單是空的，請輸入參賽者");
+            }
             for (int i = 0; i < this.players.Length; i++)
             {
                 for (int j = i + 1; j < this.players.Length; j++)
@@ -17,20 +23,31 @@
                 }
             }
         }
-
-        public void SetRandomNewRound()
+        public void setRandomRound(int seeds = 50)
         {
-            for(int i = 0; i < 50; i++)
+            for(int i = 0; i < seeds; i++)
             {
-                if(this.rounds.Count == 0) break;
-                this.rounds = ShuffleRounds(this.rounds);
-                if(this.result.Count == 0 || isContinue(this.rounds[0]))
+                if (this.rounds.Count == 0)
                 {
-                    this.result.Add(this.rounds[0]);
-                    this.rounds.RemoveAt(0);
+                    break;
+                }
+                this.rounds = ShuffleRounds(this.rounds);
+                if (SetNewRound(this.rounds[0]))
+                {
                     break;
                 }
             }
+        }
+
+        public bool SetNewRound(RoundsModel round)
+        {
+            if (this.result.Count == 0 || isContinue(round))
+            {
+                this.result.Add(round);
+                this.rounds.RemoveAt(0);
+                return true;
+            }
+            return false;
         }
 
         public void SetDefaultRound()
@@ -39,11 +56,7 @@
             temp_round = this.rounds.GetRange(0, this.rounds.Count);
             foreach (RoundsModel round in temp_round)
             {
-                if(this.result.Count == 0 ||  isContinue(round))
-                {
-                    this.result.Add(round);
-                    this.rounds.Remove(round);
-                }
+                SetNewRound(round);
             }
             if(int.IsOddInteger(this.players.Length))
             {
@@ -58,7 +71,7 @@
             string Result = "\n---------------\n";
             for(int i = 0; i < this.result.Count; i++)
             {
-                Result += $"第{i+1}場 : {this.result[i].Player1} vs. {this.result[i].Player2}\n";
+                Result += $"第{i+1, 4}場 : {this.result[i].Player1} vs. {this.result[i].Player2}\n";
             }
             Result += "---------------\n";
             if(this.rounds.Count > 0)

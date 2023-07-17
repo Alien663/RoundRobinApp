@@ -28,7 +28,7 @@ namespace RoundRobin
                 game.SetDefaultRound();
                 for(int i = 0;i < game.players.Length * (game.players.Length-1) / 2; i++)
                 {
-                    game.SetRandomNewRound();
+                    game.setRandomRound();
                 }
                 RoundResult.Text += game.ShowResult();
             }
