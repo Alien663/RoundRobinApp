@@ -13,35 +13,24 @@ namespace RoundRobin
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.activity_main);
             Button upButton = FindViewById<Button>(Resource.Id.SetRound);
+            RoundResult = FindViewById<TextView>(Resource.Id.showResult);
             upButton.Click += SetRound_click;
+            RoundResult.Text = "賽程排點結果 : \n";
         }
         public void SetRound_click(object sender, System.EventArgs e)
         {
             RoundResult = FindViewById<TextView>(Resource.Id.showResult);
+            Players = FindViewById<EditText>(Resource.Id.Players);
+            RoundResult.Text = "賽程排點結果 : \n";
             try
             {
-                Players = FindViewById<EditText>(Resource.Id.Players);
-                RoundResult.Text = "";
-                string[] _Players = Players.Text.Split("\n");
-                RoundRobin game = new RoundRobin(_Players);
+                RoundRobin game = new RoundRobin(Players.Text);
                 game.SetDefaultRound();
-                for(int i = 0;i < _Players.Length * (_Players.Length-1) / 2; i++)
+                for(int i = 0;i < game.players.Length * (game.players.Length-1) / 2; i++)
                 {
                     game.SetRandomNewRound();
                 }
-                RoundResult.Text = "";
-                for (int i = 0; i < game.result.Count; i++)
-                {
-                    RoundResult.Text += $"第{i+1}場 : {game.result[i].Player1} vs. {game.result[i].Player2}\n";
-                }
-                if (game.rounds.Count > 0)
-                {
-                    RoundResult.Text += "-------------------\n以下賽程受限規則無法排入，可以重新點擊排點以重啟本程式重排或是自行手動處理:\n";
-                    for (int i = 0; i < game.rounds.Count; i++)
-                    {
-                        RoundResult.Text += $"{game.rounds[i].Player1} vs. {game.rounds[i].Player2}\n";
-                    }
-                }
+                RoundResult.Text += game.ShowResult();
             }
             catch (Exception ex)
             {

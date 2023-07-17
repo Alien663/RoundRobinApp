@@ -9,7 +9,7 @@
     android:minHeight="25px">
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="200dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -22,31 +22,43 @@
         >
             <EditText
                 android:inputType="textMultiLine"
-                android:layout_width="194.7dp"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_weight="1"
                 android:layout_toLeftOf="@id/showResult"
                 android:id="@+id/Players"
                 android:hint="參加人員(不同人用換行隔開)"/>
             <Button
                 android:text="排點"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="2"
                 android:layout_toLeftOf="@id/Players"
                 android:id="@+id/SetRound" />
         </LinearLayout>
     </RelativeLayout>
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="500dp"
+        android:layout_height="10dp"
         android:layout_alignParentBottom="true"
         android:id="@+id/relativeLayoutBottom"
-        >
+    >
+    </RelativeLayout>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_below="@id/relativeLayoutTop"
+        android:layout_above="@id/relativeLayoutBottom"
+        android:id="@+id/relativeLayoutMiddle"
+    >
         <TextView
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_centerInParent="true"
             android:text="@string/app_text"
             android:id="@+id/showResult"
+            android:textIsSelectable="true"
+            android:selectAllOnFocus="true"
         />
     </RelativeLayout>
 </RelativeLayout>

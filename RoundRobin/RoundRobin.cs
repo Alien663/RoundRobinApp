@@ -1,78 +1,50 @@
-﻿using Android.Speech;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Text;
-using System.Threading.Tasks;
-using static Android.Graphics.Paint;
-
-namespace RoundRobin
+﻿namespace RoundRobin
 {
     public class RoundRobin
     {
-        private string[] players;
-        public List<RoundsModel> result = new List<RoundsModel>();
-        public List<RoundsModel> rounds = new List<RoundsModel>();
-        public RoundRobin(string[] players)
+        public string[] players;
+        private List<RoundsModel> result = new List<RoundsModel>();
+        private List<RoundsModel> rounds = new List<RoundsModel>();
+        public RoundRobin(string players)
         {
-            this.players = players;
-            for(int i = 0; i < players.Length; i++)
+            string[] temp = players.Split("\n");
+            this.players = temp.Where(x => !string.IsNullOrEmpty(x)).ToArray();
+            for (int i = 0; i < this.players.Length; i++)
             {
-                for(int j = i + 1; j < players.Length; j++)
+                for (int j = i + 1; j < this.players.Length; j++)
                 {
-                    rounds.Add(new RoundsModel { Player1 = players[i], Player2 = players[j] });
+                    rounds.Add(new RoundsModel { Player1 = this.players[i], Player2 = this.players[j] });
                 }
             }
         }
 
-        public bool SetRandomNewRound()
+        public void SetRandomNewRound()
         {
             for(int i = 0; i < 50; i++)
             {
-                if(this.rounds.Count == 0) return false;
+                if(this.rounds.Count == 0) break;
                 this.rounds = ShuffleRounds(this.rounds);
-                if(this.result.Count == 0)
+                if(this.result.Count == 0 || isContinue(this.rounds[0]))
                 {
                     this.result.Add(this.rounds[0]);
                     this.rounds.RemoveAt(0);
-                    return true;
-                }
-                else if (
-                       this.result.Last().Player1 != this.rounds[0].Player1
-                    && this.result.Last().Player1 != this.rounds[0].Player2
-                    && this.result.Last().Player2 != this.rounds[0].Player1
-                    && this.result.Last().Player2 != this.rounds[0].Player2
-                )
-                {
-                    this.result.Add(this.rounds[0]);
-                    this.rounds.RemoveAt(0);
-                    return true;
+                    break;
                 }
             }
-            return false;
         }
 
         public void SetDefaultRound()
         {
-            this.result.Add(this.rounds[0]);
-            this.rounds.RemoveAt(0);
             List<RoundsModel> temp_round = new List<RoundsModel>();
             temp_round = this.rounds.GetRange(0, this.rounds.Count);
             foreach (RoundsModel round in temp_round)
             {
-                if(
-                       this.result.Last().Player1 != round.Player1
-                    && this.result.Last().Player1 != round.Player2
-                    && this.result.Last().Player2 != round.Player1
-                    && this.result.Last().Player2 != round.Player2
-                )
+                if(this.result.Count == 0 ||  isContinue(round))
                 {
                     this.result.Add(round);
                     this.rounds.Remove(round);
                 }
             }
-
             if(int.IsOddInteger(this.players.Length))
             {
                 RoundsModel temp = this.rounds.First(x => x.Player2 == this.players.Last());
@@ -81,23 +53,24 @@ namespace RoundRobin
             }
         }
 
-        public void ShowResult()
+        public string ShowResult()
         {
-            Console.WriteLine("\n---------------");
+            string Result = "\n---------------\n";
             for(int i = 0; i < this.result.Count; i++)
             {
-                Console.WriteLine($"第{i}場 : {this.result[i].Player1} vs. {this.result[i].Player2}");
+                Result += $"第{i+1}場 : {this.result[i].Player1} vs. {this.result[i].Player2}\n";
             }
-            Console.WriteLine("---------------\n");
+            Result += "---------------\n";
             if(this.rounds.Count > 0)
             {
-                Console.WriteLine("以下賽程受限規則無法排入，可以輸入re以重啟本程式重排或是自行手動處理");
+                Result += "以下賽程受限規則無法排入，可以輸入re以重啟本程式重排或是自行手動處理\n";
                 for(int i = 0; i< this.rounds.Count; i++)
                 {
-                    Console.WriteLine($"{this.rounds[i].Player1} vs. {this.rounds[i].Player2}");
+                    Result += $"{this.rounds[i].Player1} vs. {this.rounds[i].Player2}\n";
                 }
-                Console.WriteLine("\n\n");
+                Result += "\n\n";
             }
+            return Result;
         }
 
         private static List<RoundsModel> ShuffleRounds(List<RoundsModel> list)
@@ -112,6 +85,16 @@ namespace RoundRobin
                 list.Remove(list[randomElementInList]);
             }
             return newShuffledList;
+        }
+
+        private bool isContinue(RoundsModel rounds)
+        {
+            if (this.result.Last().Player1 != rounds.Player1
+                && this.result.Last().Player1 != rounds.Player2
+                && this.result.Last().Player2 != rounds.Player1
+                && this.result.Last().Player2 != rounds.Player2
+            ) return true;
+            return false;
         }
     }
 }
